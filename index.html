@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>官网6.0 One·World</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #8b8d98;
+      --deep: #00020f;
+      --soft: #f4f3fa;
+      --line: rgba(255, 255, 255, 0.14);
+      --pink: #fc337c;
+      --violet: #893efa;
+      --grad: linear-gradient(110deg, #fc337c 0%, #893efa 100%);
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: 0;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 50;
+      height: 48px;
+      background: rgba(1, 2, 16, 0.96);
+      backdrop-filter: blur(18px) saturate(140%);
+    }
+    .nav-inner {
+      width: min(1280px, calc(100% - 40px));
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 111px;
+      font-size: 16.5px;
+      line-height: 20px;
+      font-weight: 650;
+    }
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 33% 36%, rgba(255,255,255,0.95) 0 11%, transparent 12%),
+        radial-gradient(circle at 70% 42%, rgba(255,255,255,0.68) 0 8%, transparent 9%),
+        linear-gradient(135deg, #fc337c 0%, #893efa 58%, #39c7ff 100%);
+      box-shadow: 0 0 18px rgba(137, 62, 250, 0.34);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      font-size: 13px;
+      line-height: 18px;
+      margin-right: auto;
+      margin-left: 32px;
+    }
+    .nav-links a {
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.7);
+      transition: color 0.2s ease;
+    }
+    .nav-links a[aria-current="page"],
+    .nav-links a:hover { color: #fff; }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .identity-switch {
+      width: 85px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px;
+      border: 0;
+      border-radius: 999px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .identity-switch::before {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 38% 30%, #fff 0 7%, transparent 8%),
+        linear-gradient(135deg, #fc337c, #893efa 62%, #39c7ff);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+      transition: transform 0.2s ease;
+    }
+    .identity-switch span {
+      color: #070812;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .identity-switch.is-alt::before { transform: translateX(57px); }
+    .identity-switch.is-alt span { transform: translateX(-20px); }
+    .nav-cta {
+      border: 0;
+      color: #000;
+      background:
+        linear-gradient(#fff, #fff) padding-box,
+        var(--grad) border-box;
+      height: 32px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 0;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.15); }
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .menu-toggle { display: none; }
+    .mobile-panel { display: none; }
+    .nav.is-open .mobile-panel {
+      display: grid;
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 56px;
+      gap: 4px;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(1, 2, 16, 0.96);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+    }
+    .mobile-panel a {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-radius: 12px;
+      color: rgba(255,255,255,0.72);
+      font-size: 14px;
+    }
+    .mobile-panel a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    }
+
+    .hero {
+      min-height: 877px;
+      padding: 48px 0 0;
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.1) 42%, rgba(0, 0, 0, 0.54) 100%),
+        url("assets/hero-one-world.png") center top / cover no-repeat,
+        #000;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.1) 38%, rgba(0,0,0,0.42) 100%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      position: relative;
+      width: min(1264px, calc(100% - 48px));
+      margin: 0 auto;
+      min-height: 829px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    .hero-copy {
+      position: relative;
+      margin-top: 228px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .eyebrow {
+      margin: 0 0 18px;
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 500;
+      color: rgba(255,255,255,0.86);
+    }
+    h1 {
+      margin: 0;
+      max-width: 1264px;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 1.12;
+      font-weight: 750;
+    }
+    .tagline {
+      margin: 22px 0 0;
+      font-size: 21px;
+      line-height: 1.4;
+      font-weight: 650;
+    }
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 24px;
+      font-size: 16px;
+      color: rgba(255,255,255,0.88);
+    }
+    .hero-points span {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-top: 28px;
+    }
+    .primary-btn,
+    .ghost-btn {
+      height: 44px;
+      padding: 0 24px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .primary-btn { background: #fff; color: #000; font-weight: 650; }
+    .ghost-btn { color: #fff; border-color: rgba(255,255,255,0.26); background: rgba(255,255,255,0.06); }
+    .one-line {
+      position: absolute;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.9);
+      font-size: 20px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .section {
+      padding: 112px 0;
+      overflow: hidden;
+    }
+    .soft { background: var(--soft); }
+    .dark { background: #000; color: #fff; }
+    .container {
+      width: min(1040px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+    .section-kicker {
+      margin: 0 0 16px;
+      font-size: 16px;
+      line-height: 1.5;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .section-title {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 56px);
+      line-height: 1.14;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+    .section-lead {
+      margin: 22px 0 0;
+      max-width: 720px;
+      color: rgba(0,0,0,0.62);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+    .dark .section-lead { color: rgba(255,255,255,0.62); }
+
+    .connection-grid {
+      margin-top: 64px;
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 72px;
+      align-items: center;
+    }
+    .stack {
+      display: grid;
+      gap: 22px;
+    }
+    .layer-card {
+      padding: 28px;
+      min-height: 132px;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 30px 90px rgba(24, 25, 40, 0.08);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .layer-card h3 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.16;
+    }
+    .layer-card p {
+      margin: 8px 0 0;
+      font-size: 21px;
+      font-weight: 650;
+      color: #f3508c;
+    }
+    .orbit-diagram {
+      min-height: 440px;
+      border-radius: 42px;
+      background:
+        radial-gradient(circle at center, rgba(252,51,124,0.18), transparent 22%),
+        radial-gradient(circle at center, #fff 0 8%, transparent 9%),
+        linear-gradient(145deg, #fff, #f0eef9);
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), 0 36px 100px rgba(45,36,82,0.1);
+    }
+    .orbit-diagram::before,
+    .orbit-diagram::after {
+      content: "";
+      position: absolute;
+      inset: 70px;
+      border-radius: 50%;
+      border: 1px dashed rgba(137,62,250,0.34);
+    }
+    .orbit-diagram::after {
+      inset: 132px;
+      border-style: solid;
+      border-color: rgba(252,51,124,0.26);
+    }
+    .node {
+      position: absolute;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--grad);
+      box-shadow: 0 20px 44px rgba(137,62,250,0.24);
+    }
+    .node:nth-child(1) { top: 52px; left: 52%; }
+    .node:nth-child(2) { top: 164px; right: 50px; }
+    .node:nth-child(3) { bottom: 56px; left: 48%; }
+    .node:nth-child(4) { top: 178px; left: 48px; }
+
+    .agent-section {
+      background:
+        radial-gradient(circle at 70% 30%, rgba(137,62,250,0.34), transparent 28%),
+        radial-gradient(circle at 36% 55%, rgba(252,51,124,0.18), transparent 28%),
+        #000;
+      color: #fff;
+    }
+    .agent-layout {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 70px;
+      align-items: center;
+    }
+    .feature-list {
+      margin-top: 24px;
+      display: grid;
+      gap: 14px;
+    }
+    .feature-item {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .feature-dot {
+      width: 14px;
+      height: 14px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--grad);
+      box-shadow: 0 0 24px rgba(252,51,124,0.55);
+    }
+    .feature-item strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+    .feature-item span {
+      display: block;
+      margin-top: 3px;
+      color: #8b8d98;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+    .phone-panel {
+      min-height: 548px;
+      border-radius: 46px;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(255,255,255,0.18), transparent 16%),
+        linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+      border: 1px solid var(--line);
+      position: relative;
+      padding: 28px;
+      box-shadow: 0 50px 160px rgba(0,0,0,0.42);
+    }
+    .phone-screen {
+      height: 492px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 50% 16%, rgba(252,51,124,0.28), transparent 24%),
+        linear-gradient(180deg, #151621, #05060b);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .assistant-card {
+      border-radius: 24px;
+      padding: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .assistant-card h3 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .assistant-card p {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.64);
+      line-height: 1.6;
+    }
+    .mini-products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .mini-card {
+      min-height: 96px;
+      border-radius: 18px;
+      background: #fff;
+      color: #000;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      font-size: 12px;
+      color: #60646c;
+    }
+    .mini-card strong {
+      color: #000;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .possibility-grid {
+      margin-top: 62px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .possibility-card {
+      min-height: 208px;
+      padding: 30px;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(21, 20, 40, 0.07);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .possibility-card small {
+      display: block;
+      margin-bottom: 24px;
+      font-size: 17px;
+      color: #1c2024;
+    }
+    .possibility-card h3 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      color: #f3508c;
+    }
+    .possibility-card p {
+      margin: 12px 0 0;
+      color: #666a73;
+      line-height: 1.65;
+    }
+
+    .cta {
+      padding: 118px 0;
+      background:
+        radial-gradient(circle at 72% 40%, rgba(252,51,124,0.2), transparent 28%),
+        #fff;
+    }
+    .cta-card {
+      min-height: 435px;
+      border-radius: 44px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 72% 46%, rgba(137,62,250,0.46), transparent 24%),
+        radial-gradient(circle at 28% 60%, rgba(252,51,124,0.34), transparent 28%),
+        #000;
+      padding: 70px 72px;
+      display: grid;
+      grid-template-columns: 1fr 0.76fr;
+      align-items: center;
+      gap: 50px;
+      overflow: hidden;
+      position: relative;
+    }
+    .cta-card h2 {
+      margin: 0;
+      max-width: 650px;
+      font-size: clamp(36px, 4.2vw, 58px);
+      line-height: 1.15;
+    }
+    .cta-card p {
+      margin: 24px 0 0;
+      color: rgba(255,255,255,0.72);
+      font-size: 21px;
+      font-weight: 650;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+    .stat {
+      padding: 22px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+    .stat span {
+      display: block;
+      margin-top: 10px;
+      color: #8b8d98;
+      font-size: 17px;
+    }
+
+    footer {
+      background: #000;
+      color: #fff;
+      padding: 58px 0;
+    }
+    .footer-inner {
+      width: min(1040px, calc(100% - 48px));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 28px;
+      color: rgba(255,255,255,0.56);
+      font-size: 14px;
+    }
+    .footer-inner strong {
+      display: block;
+      color: #fff;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .nav-links,
+      .identity-switch { display: none; }
+      .nav-actions { gap: 8px; }
+      .menu-toggle { display: inline-flex; }
+      .hero { min-height: 760px; }
+      .hero-copy { margin-top: 190px; }
+      .one-line { bottom: 54px; font-size: 17px; }
+      .connection-grid,
+      .agent-layout,
+      .cta-card {
+        grid-template-columns: 1fr;
+      }
+      .phone-panel { min-height: auto; }
+      .possibility-grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      .cta-card { padding: 44px 28px; border-radius: 30px; }
+      .footer-inner { flex-direction: column; }
+    }
+
+    @media (max-width: 560px) {
+      .nav-inner,
+      .container,
+      .footer-inner {
+        width: min(100% - 32px, 1040px);
+      }
+      .nav-cta { display: none; }
+      .hero-inner { width: calc(100% - 32px); }
+      .hero-points { gap: 10px; }
+      .hero-points span { width: 100%; justify-content: center; }
+      .hero-actions { flex-direction: column; width: 100%; }
+      .primary-btn, .ghost-btn { width: 100%; }
+      .section { padding: 76px 0; }
+      .connection-grid { gap: 38px; }
+      .orbit-diagram { min-height: 330px; border-radius: 30px; }
+      .node { width: 62px; height: 62px; font-size: 12px; }
+      .mini-products { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="SoulChain">
+        <span class="brand-mark"></span>
+        <span>SoulChain</span>
+      </a>
+      <div class="nav-links" aria-label="主导航">
+        <a href="#top" aria-current="page">首页</a>
+        <a href="#agent">Ai Agent</a>
+        <a href="#network">关于我们</a>
+      </div>
+      <div class="nav-actions">
+        <button class="identity-switch" type="button" aria-label="切换身份">
+          <span>One</span>
+        </button>
+        <a class="nav-cta" href="#network">开始连接</a>
+        <button class="icon-btn menu-toggle" type="button" aria-label="打开菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 7h14M5 12h14M5 17h14"></path>
+          </svg>
+        </button>
+        <a class="icon-btn desktop-icon" href="#possibility" aria-label="切换语言或网络">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <path d="M4 12h16M12 4c2 2.2 3 4.9 3 8s-1 5.8-3 8M12 4c-2 2.2-3 4.9-3 8s1 5.8 3 8"></path>
+          </svg>
+        </a>
+      </div>
+      <div class="mobile-panel" aria-label="移动端菜单">
+        <a href="#top">首页</a>
+        <a href="#agent">Ai Agent</a>
+        <a href="#network">关于我们</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">链接 AI 的价值创造与 Web3 权益分配<br>让生产、贡献与收益形成闭环</p>
+          <h1>连接地球上每一个有趣的灵魂</h1>
+          <p class="tagline">消除人与人连接的障碍</p>
+          <div class="hero-points" aria-label="核心能力">
+            <span>AI 了解人</span>
+            <span>代理创建连接</span>
+            <span>灵魂链连接人类</span>
+          </div>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#connection">开始连接</a>
+            <a class="ghost-btn" href="#agent">了解 AI Soul</a>
+          </div>
+        </div>
+        <div class="one-line">One is everything</div>
+      </div>
+    </section>
+
+    <section class="section soft" id="connection">
+      <div class="container">
+        <p class="section-kicker reveal">现实的连接</p>
+        <h2 class="section-title reveal">连接人与人之间的关系</h2>
+        <p class="section-lead reveal">迄今为止，互联网连接信息，区块链连接价值，而 One·World 要把连接推进到灵魂与关系本身。</p>
+
+        <div class="connection-grid">
+          <div class="stack reveal">
+            <article class="layer-card">
+              <h3>信息层</h3>
+              <p>互联网</p>
+            </article>
+            <article class="layer-card">
+              <h3>价值层</h3>
+              <p>区块链</p>
+            </article>
+            <article class="layer-card">
+              <h3>连接层</h3>
+              <p>灵魂链</p>
+            </article>
+          </div>
+          <div class="orbit-diagram reveal" aria-label="连接层示意图">
+            <span class="node">AI</span>
+            <span class="node">Web3</span>
+            <span class="node">Soul</span>
+            <span class="node">World</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section agent-section" id="agent">
+      <div class="container agent-layout">
+        <div>
+          <p class="section-kicker reveal">灵魂代理人</p>
+          <h2 class="section-title reveal">你的 AI Soul 经纪人</h2>
+          <p class="section-lead reveal">不是助理，而是你灵魂的数字延伸。它理解你、代表你，并持续为你发现机会和建立连接。</p>
+          <div class="feature-list reveal">
+            <div class="feature-item"><span class="feature-dot"></span><div><strong>理解你</strong><span>真正了解你是谁</span></div></div>
+            <div class="feature-item"><span class="feature-dot"></span><div><strong>代表你</strong><span>Be your digital identity</span></div></div>
+            <div class="feature-item"><span class="feature-dot"></span><div><strong>发现机会</strong><span>Discover opportunities worldwide</span></div></div>
+            <div class="feature-item"><span class="feature-dot"></span><div><strong>建立连接</strong><span>Find and connect like-minded souls</span></div></div>
+            <div class="feature-item"><span class="feature-dot"></span><div><strong>保护隐私</strong><span>Secure your data and privacy</span></div></div>
+            <div class="feature-item"><span class="feature-dot"></span><div><strong>共同成长</strong><span>Evolve and grow together</span></div></div>
+          </div>
+        </div>
+
+        <div class="phone-panel reveal">
+          <div class="phone-screen">
+            <div class="assistant-card">
+              <h3>AI Soul</h3>
+              <p>把你的兴趣、身份、贡献和关系收束成一个持续进化的数字代理。</p>
+            </div>
+            <div class="mini-products">
+              <div class="mini-card"><strong>IP</strong>AI 短剧共创</div>
+              <div class="mini-card"><strong>DEX</strong>现货与合约交易</div>
+              <div class="mini-card"><strong>DreamOS</strong>AI 创作平台</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft" id="possibility">
+      <div class="container">
+        <p class="section-kicker reveal">灵魂 AI</p>
+        <h2 class="section-title reveal">每个连接 创造无限可能</h2>
+        <p class="section-lead reveal">距离消失，语言无障碍，文化无界，连接如此简单。</p>
+
+        <div class="possibility-grid">
+          <article class="possibility-card reveal">
+            <small>AI Agent</small>
+            <h3>Blockchain</h3>
+            <p>让价值创造、贡献记录与收益分配拥有可信的结算网络。</p>
+          </article>
+          <article class="possibility-card reveal">
+            <small>AI Agent</small>
+            <h3>SoulChain</h3>
+            <p>用灵魂链沉淀身份、关系、信任和长期协作的连接资产。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="network">
+      <div class="container">
+        <div class="cta-card reveal">
+          <div>
+            <p class="section-kicker">One · World · Dao</p>
+            <h2>全球首个 AI Agent + Web3 驱动的人际连接网络</h2>
+            <p>重塑人类连接的底层网络</p>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>8,000,000,000+</strong><span>用户</span></div>
+            <div class="stat"><strong>∞</strong><span>无限连接</span></div>
+            <div class="stat"><strong>200+</strong><span>国家与地区</span></div>
+            <div class="stat"><strong>24 / 7</strong><span>永不离线</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <strong>One·World</strong>
+        AI Agent + Web3 connection network
+      </div>
+      <div>© 2026 Socrates. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) entry.target.classList.add("visible");
+      }
+    }, { threshold: 0.16 });
+
+    document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+
+    const nav = document.querySelector(".nav");
+    const menuToggle = document.querySelector(".menu-toggle");
+    const identitySwitch = document.querySelector(".identity-switch");
+    const identityLabel = identitySwitch?.querySelector("span");
+
+    identitySwitch?.addEventListener("click", () => {
+      const isAlt = identitySwitch.classList.toggle("is-alt");
+      identityLabel.textContent = isAlt ? "Dao" : "One";
+    });
+
+    menuToggle?.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      menuToggle.setAttribute("aria-label", isOpen ? "关闭菜单" : "打开菜单");
+    });
+
+    document.querySelectorAll(".mobile-panel a").forEach((link) => {
+      link.addEventListener("click", () => nav.classList.remove("is-open"));
+    });
+  </script>
+</body>
+</html>
